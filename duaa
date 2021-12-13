@@ -1,0 +1,803 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+//import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import javafx.scene.control.Label;
+//import javafx.application.Application;
+//import javafx.event.ActionEvent;
+//import javafx.event.EventHandler;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+//import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableView;
+import javafx.stage.Stage;
+import javafx.util.Callback;
+
+//import javafx.stage.Stage;
+
+
+public class duaa extends Application {
+	
+	 private TableView table = new TableView();
+
+	    private Connection connection;
+	    private ObservableList<String> dbTypes = FXCollections.observableArrayList("MariaDB", "MongoDB", "MySQL", "OracleDB", "SQLite");
+	    @SuppressWarnings("rawtypes")
+		private ObservableList<ObservableList> data;
+	 
+	
+	 
+    Button btnCustomer = new Button("Customers");
+    Button btnEmploy = new Button("Employees");
+    Button btnOffices = new Button("Offices");
+    Button btndetails = new Button("OrderDetails");
+    Button btnInsert = new Button("Insert");
+    Button btnOrders = new Button("Orders");
+    Button btnPayments = new Button("Payments");
+    Button btnProductline = new Button("Productline");
+    Button btnProduct = new Button("Product");
+
+
+
+	  
+
+	public static void main(String[] args) {
+		Application.launch(args);
+	}
+	@Override
+	public void  start(Stage primaryStage) throws Exception {
+		primaryStage.setTitle("Registration Form JavaFX Application");
+
+		// Create the registration form grid pane
+		GridPane gridPane = createRegistrationFormPane();
+		// Add UI controls to the registration form grid pane
+		addUIControls(gridPane);
+		// Create a scene with registration form grid pane as the root node
+		
+		BorderPane borderPane  =new BorderPane();
+		   borderPane.setTop(gridPane);
+		     borderPane.setCenter(table);
+		 	Label show = new Label(" Tables ");
+		     // LEFT
+		
+		   
+		      btnCustomer.setPadding(new Insets(30, 30, 30, 30));
+//		      borderPane.setLeft(btnCustomer);
+		      // Set margin for left area.
+		      BorderPane.setMargin(btnCustomer, new Insets(5, 5, 5, 5));
+		      // LEFT2
+		     
+		      btnEmploy.setPadding(new Insets(30, 30, 30, 30));
+//		      borderPane.setLeft(btnEmploy);
+		      // Set margin for left area.
+		      BorderPane.setMargin(btnEmploy, new Insets(5, 5, 5, 5));
+		      // LEFT3
+		      
+		      btnOrders.setPadding(new Insets(30, 30, 30, 30));
+//		      borderPane.setLeft(btnEmploy);
+		      // Set margin for left area.
+		      BorderPane.setMargin(btnOrders, new Insets(5, 5, 5, 5));
+		      // LEFT3
+		//      Button btnproducts = new Button("Products  ");
+		   //   btnProducts.setPadding(new Insets(30, 30, 30, 30));
+	
+//		      borderPane.setLeft(btnEmploy);
+		      // Set margin for left area.
+		      //BorderPane.setMargin(btnProducts, new Insets(5, 5, 5, 5));
+		      
+		  //    Button btnoffices = new Button("Offices  ");
+		      btnOffices.setPadding(new Insets(30, 30, 30, 30));
+//		      borderPane.setLeft(btnEmploy);
+		      // Set margin for left area.
+		      BorderPane.setMargin(btnOffices, new Insets(5, 5, 5, 5));
+		      
+		      btnPayments.setPadding(new Insets(30, 30, 30, 30));
+//		      borderPane.setLeft(btnEmploy);
+		      // Set margin for left area.
+		      BorderPane.setMargin(btnPayments, new Insets(5, 5, 5, 5));
+		      
+		      //Place all demonstration buttons in a Vercial Box.
+		        VBox buttonBox = new VBox();
+
+		        //Set Alignment of Buttons in VBox Container.
+		        buttonBox.setAlignment(Pos.TOP_CENTER);
+
+		        //Give VBox a CSS ID
+		        buttonBox.setId("buttonMenuContainer");        //Create some vertical spacing b/n buttons
+		        buttonBox.setSpacing(20); 
+		        buttonBox.getChildren().addAll( show,btnCustomer , btnEmploy ,btnOrders,btnOffices,btnPayments );
+
+		       
+
+		        //Place into Application.
+		     
+		        borderPane.setLeft(buttonBox);
+
+		      FlowPane buttons = new FlowPane() ;
+	         buttons.getChildren().addAll( btnCustomer , btnEmploy ,btnOrders,btnOffices,btnPayments) ;
+      	      borderPane.setLeft(buttons);
+		      
+		      
+		Scene scene = new Scene(borderPane, 500, 500);//55
+		// Set the scene in primary stage
+		primaryStage.setScene(scene);
+		
+		primaryStage.show();
+	       
+
+	}
+
+	private GridPane createRegistrationFormPane() {
+		// Instantiate a new Grid Pane
+		GridPane gridPane = new GridPane();
+
+		// Position the pane at the center of the screen, both vertically and
+		// horizontally
+		gridPane.setAlignment(Pos.CENTER);
+
+		// Set a padding of 20px on each side
+		gridPane.setPadding(new Insets(40, 40, 40, 40));
+
+		// Set the horizontal gap between columns
+		gridPane.setHgap(10);
+
+		// Set the vertical gap between rows
+		gridPane.setVgap(10);
+
+		// Add Column Constraints
+
+		// columnOneConstraints will be applied to all the nodes placed in column one.
+		ColumnConstraints columnOneConstraints = new ColumnConstraints(100, 100, Double.MAX_VALUE);
+		columnOneConstraints.setHalignment(HPos.RIGHT);
+
+		// columnTwoConstraints will be applied to all the nodes placed in column two.
+		ColumnConstraints columnTwoConstrains = new ColumnConstraints(200, 200, Double.MAX_VALUE);
+		columnTwoConstrains.setHgrow(Priority.ALWAYS);
+
+		gridPane.getColumnConstraints().addAll(columnOneConstraints, columnTwoConstrains);
+
+		return gridPane;
+	}
+
+	private void addUIControls(GridPane gridPane) {
+		// Add Header
+		Label headerLabel = new Label("Registration ");
+		headerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+		gridPane.add(headerLabel, 0, 0, 10, 1);
+		GridPane.setHalignment(headerLabel, HPos.CENTER);
+		GridPane.setMargin(headerLabel, new Insets(20, 0, 20, 0));
+
+		// Add Name Label
+		Label fnameLabel = new Label(" Name : ");
+		gridPane.add(fnameLabel, 0, 1);
+
+		// Add Name Text Field
+		TextField fnameField = new TextField();
+		fnameField.setMaxWidth(250);
+		fnameField.setPrefHeight(40);
+		gridPane.add(fnameField, 1, 1);
+
+
+
+		// Add city Label
+		Label cityLabel = new Label("city : ");
+		gridPane.add(cityLabel, 0, 2);
+
+		// Add city Field
+		TextField cityField = new TextField();
+		cityField.setMaxWidth(250);
+		cityField.setPrefHeight(40);
+		gridPane.add(cityField, 1, 2);
+
+		// Add country Label
+		Label countrylabel = new Label("Country : ");
+		gridPane.add(countrylabel, 0, 3);
+		// Add country Field
+		TextField countryField = new TextField();
+		countryField.setMaxWidth(250);
+		countryField.setPrefHeight(40);
+		gridPane.add(countryField, 1, 3);
+
+		// Add credit limit Field
+		TextField climitField = new TextField();
+		climitField.setMaxWidth(250);
+		climitField.setPrefHeight(40);
+		gridPane.add(climitField, 1, 4);
+
+		// Add cridit limit Label
+		Label climitlabel = new Label("Credit limit: ");
+		gridPane.add(climitlabel, 0, 4);
+		gridPane.setVisible(true);
+		// Add Submit Button
+		Button SearchButton = new Button("Search");
+		SearchButton.setPrefHeight(40);
+		SearchButton.setDefaultButton(true);
+		SearchButton.setPrefWidth(100);
+		gridPane.add(SearchButton, 0, 5, 2, 1);
+		gridPane.add(btnInsert, 0, 5, 2, 1);
+		GridPane.setHalignment(SearchButton, HPos.LEFT);
+		GridPane.setMargin(SearchButton, new Insets(20, 30, 70, 0));
+		
+
+	
+		SearchButton.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				
+				String fname = fnameField.getText();
+				String city = cityField.getText();
+				String country = countryField.getText();
+				String cLimit = climitField.getText();
+
+				String sql = "select * from customers where customerName like '%" + fname + "%' or city like'%" + city
+						+ "%' or country like '%" + country + "%' or creditLimit like'%" + cLimit + "%'   ";
+               System.out.println(sql);
+
+				Connection con;
+				
+				
+				try {
+					Class.forName("com.mysql.jdbc.Driver");
+
+					con = DriverManager.getConnection("jdbc:mysql://localhost:3306/duaa_201904267", "root", "");
+
+					Statement stmt2 = con.createStatement();
+					ResultSet rs2 = stmt2.executeQuery(sql);
+					
+				  
+					 con.close();
+					 
+					 
+//					while (rs2.next()) {
+//						System.out.print(rs2.getString(2));
+//						System.out.println();
+//					}
+				} catch (SQLException | ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			
+			
+		});
+		
+		
+		//Customer table
+		btnCustomer.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				
+				table.getItems().clear();
+				table.getColumns().clear();
+			
+
+				String sql = "select * from customers";
+       
+
+				Connection con;
+				 data = FXCollections.observableArrayList();
+				
+				
+				try {
+					Class.forName("com.mysql.jdbc.Driver");
+
+					con = DriverManager.getConnection("jdbc:mysql://localhost:3306/duaa_201904267", "root", "");
+
+//					Statement stmt2 = con.createStatement();
+//					ResultSet rs2 = stmt2.executeQuery(sql);
+					ResultSet rs2 = con.createStatement().executeQuery(sql);
+					
+				     for(int i=0 ; i<rs2.getMetaData().getColumnCount(); i++){
+			                //We are using non property style for making dynamic table
+			                final int j = i;                
+			                TableColumn col = new TableColumn(rs2.getMetaData().getColumnName(i+1));
+			                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList,String>,ObservableValue<String>>(){                    
+			                    public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {                                                                                              
+			                        return new SimpleStringProperty((String) param.getValue().get(j));                        
+			                    }                    
+			                });
+
+			                table.getColumns().addAll(col); 
+			                System.out.println("Column ["+i+"] ");
+			                
+//					         while (rs2.next()) {
+//					            String firstname = rs2.getString("customerNumber");
+////					            String jobTitle = rs2.getString("jobTitle");
+////					            String lastname = rs2.getString("lastName");
+//
+//					            System.out.println("   "+firstname+ "     " );
+//					         }
+			            }
+				     
+				     /************
+			             * Data added to ObservableList *
+			             ************/
+			            while(rs2.next()){
+			                //Iterate Row
+			                ObservableList<String> row = FXCollections.observableArrayList();
+			                for(int i=1 ; i<=rs2.getMetaData().getColumnCount(); i++){
+			                    //Iterate Column
+			                    row.add(rs2.getString(i));
+			                }
+			                System.out.println("Row [1] added "+row );
+			                data.add(row);
+			               
+
+			            }
+			            //FINALLY ADDED TO TableView
+			            table.setItems(data);
+			                
+			            con.close();
+					 
+
+				} catch (SQLException | ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			
+			
+		});
+		
+		//Customer table
+		btnPayments.setOnAction(new EventHandler<ActionEvent>() {
+
+					@Override
+					public void handle(ActionEvent event) {
+						
+						table.getItems().clear();
+						table.getColumns().clear();
+					
+
+						String sql = "select * from Payments";
+		       
+
+						Connection con;
+						 data = FXCollections.observableArrayList();
+						
+						
+						try {
+							Class.forName("com.mysql.jdbc.Driver");
+
+							con = DriverManager.getConnection("jdbc:mysql://localhost:3306/duaa_201904267", "root", "");
+
+//							Statement stmt2 = con.createStatement();
+//							ResultSet rs2 = stmt2.executeQuery(sql);
+							ResultSet rs2 = con.createStatement().executeQuery(sql);
+							
+						     for(int i=0 ; i<rs2.getMetaData().getColumnCount(); i++){
+					                //We are using non property style for making dynamic table
+					                final int j = i;                
+					                TableColumn col = new TableColumn(rs2.getMetaData().getColumnName(i+1));
+					                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList,String>,ObservableValue<String>>(){                    
+					                    public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {                                                                                              
+					                        return new SimpleStringProperty((String) param.getValue().get(j));                        
+					                    }                    
+					                });
+
+					                table.getColumns().addAll(col); 
+					                System.out.println("Column ["+i+"] ");
+					                
+//							         while (rs2.next()) {
+//							            String firstname = rs2.getString("customerNumber");
+////							            String jobTitle = rs2.getString("jobTitle");
+////							            String lastname = rs2.getString("lastName");
+		//
+//							            System.out.println("   "+firstname+ "     " );
+//							         }
+					            }
+						     
+						     /************
+					             * Data added to ObservableList *
+					             ************/
+					            while(rs2.next()){
+					                //Iterate Row
+					                ObservableList<String> row = FXCollections.observableArrayList();
+					                for(int i=1 ; i<=rs2.getMetaData().getColumnCount(); i++){
+					                    //Iterate Column
+					                    row.add(rs2.getString(i));
+					                }
+					                System.out.println("Row [1] added "+row );
+					                data.add(row);
+					               
+
+					            }
+					            //FINALLY ADDED TO TableView
+					            table.setItems(data);
+					                
+					            con.close();
+							 
+
+						} catch (SQLException | ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					
+					
+					
+				});
+				
+		
+		
+		
+		//EMPLOYEE
+		
+		btnEmploy.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				
+				table.getItems().clear();
+				table.getColumns().clear();
+			
+		
+				String sql = "select * from employees";
+       
+
+				Connection con;
+				 data = FXCollections.observableArrayList();
+				
+				
+				try {
+					Class.forName("com.mysql.jdbc.Driver");
+
+					con = DriverManager.getConnection("jdbc:mysql://localhost:3306/duaa_201904267", "root", "");
+
+//					Statement stmt2 = con.createStatement();
+//					ResultSet rs2 = stmt2.executeQuery(sql);
+					ResultSet rs2 = con.createStatement().executeQuery(sql);
+					
+				     for(int i=0 ; i<rs2.getMetaData().getColumnCount(); i++){
+			                //We are using non property style for making dynamic table
+			                final int j = i;                
+			                TableColumn col = new TableColumn(rs2.getMetaData().getColumnName(i+1));
+			                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList,String>,ObservableValue<String>>(){                    
+			                    public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {                                                                                              
+			                    	 return new SimpleStringProperty((String) param.getValue().get(j));                          
+			                    }                    
+			                });
+
+			                table.getColumns().addAll(col); 
+			                System.out.println("Column ["+i+"] ");
+			            }
+				     
+				     /************
+			             * Data added to ObservableList *
+			             ************/
+			            while(rs2.next()){
+			                //Iterate Row
+			                ObservableList<String> row = FXCollections.observableArrayList();
+			                for(int i=1 ; i<=rs2.getMetaData().getColumnCount(); i++){
+			                    //Iterate Column
+			                    row.add(rs2.getString(i));
+			                }
+			                System.out.println("Row [1] added "+row );
+			                data.add(row);
+			               
+
+			            }
+			            //FINALLY ADDED TO TableView
+			            table.setItems(data);
+			            con.close();
+			           
+					 
+
+				} catch (SQLException | ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			
+			
+		});
+		
+	//offices
+		
+		btnOffices.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				
+				table.getItems().clear();
+				table.getColumns().clear();
+			
+			
+
+				String sql = "select * from offices";
+       
+
+				Connection con;
+				 data = FXCollections.observableArrayList();
+				
+				
+				try {
+					Class.forName("com.mysql.jdbc.Driver");
+
+					con = DriverManager.getConnection("jdbc:mysql://localhost:3306/duaa_201904267", "root", "");
+
+//					Statement stmt2 = con.createStatement();
+//					ResultSet rs2 = stmt2.executeQuery(sql);
+					ResultSet rs2 = con.createStatement().executeQuery(sql);
+					
+				     for(int i=0 ; i<rs2.getMetaData().getColumnCount(); i++){
+			                //We are using non property style for making dynamic table
+			                final int j = i;                
+			                TableColumn col = new TableColumn(rs2.getMetaData().getColumnName(i+1));
+			                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList,String>,ObservableValue<String>>(){                    
+			                    public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {                                                                                              
+			                    	 return new SimpleStringProperty((String) param.getValue().get(j));                          
+			                    }                    
+			                });
+
+			                table.getColumns().addAll(col); 
+			                System.out.println("Column ["+i+"] ");
+			            }
+				     
+				     /************
+			             * Data added to ObservableList *
+			             ************/
+			            while(rs2.next()){
+			                //Iterate Row
+			                ObservableList<String> row = FXCollections.observableArrayList();
+			                for(int i=1 ; i<=rs2.getMetaData().getColumnCount(); i++){
+			                    //Iterate Column
+			                    row.add(rs2.getString(i));
+			                }
+			                System.out.println("Row [1] added "+row );
+			                data.add(row);
+			               
+
+			            }
+			            //FINALLY ADDED TO TableView
+			            table.setItems(data);
+			            con.close();
+			           
+					 
+
+				} catch (SQLException | ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					System.out.println(e.getMessage());
+					//e.printStackTrace();
+				}
+			}
+			
+			
+			
+		});
+		
+		btnOrders.setOnAction(new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					
+					table.getItems().clear();
+					table.getColumns().clear();
+			 System.out.println();
+					String sql = "select * from orders";
+					System.out.println(sql);
+
+					Connection con;
+					 data = FXCollections.observableArrayList();
+					
+					
+					try {
+						Class.forName("com.mysql.jdbc.Driver");
+
+						con = DriverManager.getConnection("jdbc:mysql://localhost:3306/duaa_201904267", "root", "");
+						ResultSet rs2 = con.createStatement().executeQuery(sql);
+						
+					     for(int i=0 ; i<rs2.getMetaData().getColumnCount(); i++){
+				                //We are using non property style for making dynamic table
+				                final int j = i;                
+				                TableColumn col = new TableColumn(rs2.getMetaData().getColumnName(i+1));
+				                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList,String>,ObservableValue<String>>(){                    
+				                    public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {                                                                                              
+				                        return new SimpleStringProperty((String) param.getValue().get(j));                        
+				                    }                    
+				                });
+
+				                table.getColumns().addAll(col); 
+				                System.out.println("Column ["+i+"] ");
+				                
+
+				            }
+					     
+					     /************
+				             * Data added to ObservableList *
+				             ************/
+				            while(rs2.next()){
+				                //Iterate Row
+				                ObservableList<String> row = FXCollections.observableArrayList();
+				                for(int i=1 ; i<=rs2.getMetaData().getColumnCount(); i++){
+				                    //Iterate Column
+				                    row.add(rs2.getString(i));
+				                }
+				                System.out.println("Row [1] added "+row );
+				                data.add(row);
+				                
+
+				            }
+				            //FINALLY ADDED TO TableView
+				            table.setItems(data);
+				            con.close();
+				           
+						 
+
+					} catch (SQLException | ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+				
+				
+			});
+		
+		
+		
+		//INSERT
+		btnInsert.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				
+			
+				String fname = fnameField.getText();
+				String cityname =cityField.getText();
+				String country = countryField.getText();
+
+				String sql = " INSERT INTO Customers VALUES ("+cityname+")";
+
+       
+
+				Connection con;
+				
+				
+				
+				try {
+					Class.forName("com.mysql.jdbc.Driver");
+
+					con = DriverManager.getConnection("jdbc:mysql://localhost:3306/duaa_201904267", "root", "");
+
+					ResultSet rs3 = con.createStatement().executeQuery(sql);
+				
+				
+
+				} catch (SQLException | ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			
+			
+		});
+
+}
+}
+
+		
+//
+//		private void insertUIControls(GridPane gridPane) {
+//			// Add Header
+//			Label headerLabel = new Label("Insertion Form");
+//			headerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+//			gridPane.add(headerLabel, 0, 0, 10, 1);
+//			GridPane.setHalignment(headerLabel, HPos.CENTER);
+//			GridPane.setMargin(headerLabel, new Insets(20, 0, 20, 0));
+//
+//			// Add Name Label
+//			Label customerNumber = new Label(" customer Name : ");
+//			gridPane.add(customerNumber, 0, 1);
+//
+//			// Add Name Text Field
+//			TextField CustomerNum = new TextField();
+//			CustomerNum.setPrefHeight(40);
+//			gridPane.add(CustomerNum, 1, 1);
+//
+//
+//
+//			// Add city Label
+//			Label checkNumber = new Label("city : ");
+//			gridPane.add(checkNumber, 0, 2);
+//
+//			// Add city Field
+//			TextField checkNum = new TextField();
+//			checkNum.setPrefHeight(40);
+//			gridPane.add(checkNum, 1, 2);
+//
+//			// Add country Label
+//			Label amount = new Label("Country : ");
+//			gridPane.add(amount, 0, 3);
+//			// Add country Field
+//			TextField amountT= new TextField();
+//			amountT.setPrefHeight(40);
+//			gridPane.add(amountT, 1, 3);
+//
+//			// Add credit limit Field
+//			TextField climitField = new TextField();
+//			climitField.setPrefHeight(40);
+//			gridPane.add(climitField, 1, 4);
+////
+////			// Add cridit limit Label
+////			Label climitlabel = new Label("Credit limit: ");
+////			gridPane.add(climitlabel, 0, 4);
+//
+//			// Add Submit Button
+//			Button insertButton = new Button("insert");
+//			insertButton.setPrefHeight(40);
+//			insertButton.setDefaultButton(true);
+//			insertButton.setPrefWidth(100);
+//			gridPane.add(insertButton, 0, 5, 2, 1);
+//			GridPane.setHalignment(insertButton, HPos.RIGHT);
+//			GridPane.setMargin(insertButton, new Insets(20, 30, 70, 0));
+//
+//		
+//			insertButton.setOnAction(new EventHandler<ActionEvent>() {
+//
+//				@Override
+//				public void handle(ActionEvent event) {
+//		
+//					
+//
+//					String cname = fnameField.getText();
+//
+//
+//				String sql0 =" INSERT INTO Customers VALUES ("+cname+")";
+//					
+//					  
+//				
+//					
+//					
+//					
+//					
+//						Class.forName("com.mysql.jdbc.Driver");
+//						Connection con;
+//						con = DriverManager.getConnection("jdbc:mysql://localhost:3306/nadeen_db", "root", "");
+//
+//						Statement stmt2 = con.createStatement();
+//						ResultSet rs2 = stmt2.executeQuery(sql);
+//						while (rs2.next()) {
+//							System.out.print(rs2.getString(2));
+//							System.out.println();
+//						}
+//
+//					}
+//				
+//				
+//				catch (SQLException | ClassNotFoundException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//			});
+//
